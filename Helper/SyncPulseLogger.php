@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 /**
- * @author Roberto Ballesteros <rballesteros.widook@distelsa.com.gt>
+ * @author Roberto Ballesteros <heartub.api@gmail.com>
  * @package Heartub\EntitySyncPulse - Publishes entity change events to RabbitMQ in Magento Commerce Cloud
  */
 
@@ -17,8 +17,17 @@ use Monolog\Logger as CoreLogger;
 
 class SyncPulseLogger extends AbstractHelper
 {
+    /**
+     * @var int
+     */
     public const INFO = CoreLogger::INFO;
+    /**
+     * @var int
+     */
     public const ERROR = CoreLogger::ERROR;
+    /**
+     * @var int
+     */
     public const CRITICAL = CoreLogger::CRITICAL;
 
     /**

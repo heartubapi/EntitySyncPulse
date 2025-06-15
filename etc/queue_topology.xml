@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @author Roberto Ballesteros <heartub.api@gmail.com>
+ * @package Heartub\EntitySyncPulse - Publishes entity change events to RabbitMQ in Magento Commerce Cloud
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework-message-queue:etc/topology.xsd">
+    <exchange name="heartub.events-exchange" type="topic" connection="amqp">
+        <binding id="heartubProductCreatedBinding"
+                 topic="heartub.product.created"
+                 destinationType="queue"
+                 destination="heartub.product.created.queue" />
+        <binding id="heartubProductModifiedBinding"
+                 topic="heartub.product.modified"
+                 destinationType="queue"
+                 destination="heartub.product.modified.queue" />
+    </exchange>
+</config>
