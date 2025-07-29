@@ -14,15 +14,22 @@ use Magento\Catalog\Api\Data\ProductInterface;
 use Magento\Framework\Exception\LocalizedException;
 use Magento\Framework\DataObject;
 use Heartub\EntitySyncPulse\Helper\SyncPulseLogger as Logger;
+use Heartub\EntitySyncPulse\Model\Pattern\Builder\Request\ProductSyncRequestBuilder;
+use Heartub\EntitySyncPulse\Enum\RabbitParams;
+use Heartub\EntitySyncPulse\Service\Publisher\QueuePublisher;
 
 class EntityManagerEvent
 {
 
     /**
      * @param Logger $logger
+     * @param ProductSyncRequestBuilder $productSyncRequestBuilder
+     * @param QueuePublisher $queuePublisher
      */
     public function __construct(
-        private readonly Logger $logger
+        private readonly Logger $logger,
+        private readonly ProductSyncRequestBuilder $productSyncRequestBuilder,
+        private readonly QueuePublisher $queuePublisher,
     ) {
     }
 
@@ -38,9 +45,12 @@ class EntityManagerEvent
         if ($entity instanceof ProductInterface) {
             try {
                 $entityId = (string)$entity->getData('entity_id') ?? '';
-                if (!empty($entityId)) {
-                    //TODO: publish a message to the exchange on internal rabbitmq
-                    $test = '';
+                $newProduct = $entity->isObjectNew() ?? false;
+                if (!empty($entityId) && $newProduct) {
+                    $params = $entity->getData();
+                    $request = $this->productSyncRequestBuilder->setParams($params)->setRequestId((int)$entityId)
+                        ->build();
+                    $this->queuePublisher->publish(RabbitParams::ECOMMERCE_PRODUCT_MODIFIED->value, $request);
                 }
             } catch (LocalizedException $e) {
                 $this->logger->log($e->getMessage(), Logger::ERROR, []);
